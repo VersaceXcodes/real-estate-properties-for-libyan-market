@@ -1,0 +1,21 @@
+{
+  "timestamp": 1754410079972,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "real-estate-properties-for-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/real-estate-properties-for-libyan-market/backend/package.json",
+      "type": "text",
+      "size": 1447,
+      "dependencies": true
+    },
+    {
+      "path": "../../apps/real-estate-properties-for-libyan-market/backend/.env",
+      "type": "text",
+      "size": 538,
+      "dependencies": false
+    }
+  ]
+}

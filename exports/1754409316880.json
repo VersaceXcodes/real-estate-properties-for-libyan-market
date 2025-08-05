@@ -1,0 +1,15 @@
+{
+  "timestamp": 1754409316880,
+  "operation": {
+    "id": "db:schemas:zod"
+  },
+  "projectId": "real-estate-properties-for-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/real-estate-properties-for-libyan-market/backend/schema.ts",
+      "type": "text",
+      "size": 44088,
+      "dependencies": false
+    }
+  ]
+}

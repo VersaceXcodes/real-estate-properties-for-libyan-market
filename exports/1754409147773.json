@@ -1,0 +1,15 @@
+{
+  "timestamp": 1754409147773,
+  "operation": {
+    "id": "db:postgres"
+  },
+  "projectId": "real-estate-properties-for-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/real-estate-properties-for-libyan-market/backend/db.sql",
+      "type": "text",
+      "size": 38970,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,1334 @@
+asyncapi: 2.0.0
+info:
+  title: LibyanHomes Real Estate Platform - Realtime Events API
+  version: 1.0.0
+  description: Comprehensive realtime event system for LibyanHomes platform
+    covering messaging, notifications, property updates, and user interactions
+  contact:
+    name: LibyanHomes Development Team
+    email: dev@libyanhomes.com
+servers:
+  development:
+    url: ws://localhost:3000
+    protocol: ws
+    description: Development WebSocket server for realtime events
+channels:
+  user/{user_id}/messages:
+    parameters:
+      user_id:
+        description: Unique identifier for the user receiving messages
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveUserMessages
+      message:
+        $ref: "#/components/messages/NewMessageReceived"
+  user/{user_id}/notifications:
+    parameters:
+      user_id:
+        description: Unique identifier for the user receiving notifications
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveUserNotifications
+      message:
+        oneOf:
+          - $ref: "#/components/messages/PropertyViewNotification"
+          - $ref: "#/components/messages/InquiryReceivedNotification"
+          - $ref: "#/components/messages/FavoriteAddedNotification"
+          - $ref: "#/components/messages/PropertyStatusUpdateNotification"
+          - $ref: "#/components/messages/PriceChangeNotification"
+          - $ref: "#/components/messages/NewPropertyAlertNotification"
+          - $ref: "#/components/messages/ViewingRequestNotification"
+  user/{user_id}/inquiries:
+    parameters:
+      user_id:
+        description: Unique identifier for the property owner/agent receiving inquiries
+        schema:
+          type: string
+    subscribe:
+      operationId: receivePropertyInquiries
+      message:
+        $ref: "#/components/messages/NewInquiryReceived"
+  user/{user_id}/favorites:
+    parameters:
+      user_id:
+        description: Unique identifier for the user managing favorites
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveFavoriteUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/FavoritePropertyAdded"
+          - $ref: "#/components/messages/FavoritePropertyRemoved"
+          - $ref: "#/components/messages/FavoriteListCreated"
+          - $ref: "#/components/messages/FavoriteListUpdated"
+  user/{user_id}/search_alerts:
+    parameters:
+      user_id:
+        description: Unique identifier for the user receiving search alerts
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveSearchAlerts
+      message:
+        $ref: "#/components/messages/SavedSearchAlert"
+  user/{user_id}/presence:
+    parameters:
+      user_id:
+        description: Unique identifier for the user
+        schema:
+          type: string
+    subscribe:
+      operationId: receivePresenceUpdates
+      message:
+        $ref: "#/components/messages/UserPresenceUpdate"
+    publish:
+      operationId: updateUserPresence
+      message:
+        $ref: "#/components/messages/UserPresenceUpdate"
+  property/{property_id}/views:
+    parameters:
+      property_id:
+        description: Unique identifier for the property being viewed
+        schema:
+          type: string
+    publish:
+      operationId: trackPropertyView
+      message:
+        $ref: "#/components/messages/PropertyViewTracked"
+  property/{property_id}/updates:
+    parameters:
+      property_id:
+        description: Unique identifier for the property receiving updates
+        schema:
+          type: string
+    subscribe:
+      operationId: receivePropertyUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/PropertyDetailsUpdated"
+          - $ref: "#/components/messages/PropertyMediaUpdated"
+          - $ref: "#/components/messages/PropertyStatusChanged"
+          - $ref: "#/components/messages/PropertyPriceChanged"
+  conversation/{conversation_id}/messages:
+    parameters:
+      conversation_id:
+        description: Unique identifier for the conversation thread
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveConversationMessages
+      message:
+        $ref: "#/components/messages/ConversationMessageReceived"
+    publish:
+      operationId: sendConversationMessage
+      message:
+        $ref: "#/components/messages/ConversationMessageSent"
+  conversation/{conversation_id}/typing:
+    parameters:
+      conversation_id:
+        description: Unique identifier for the conversation thread
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveTypingIndicator
+      message:
+        $ref: "#/components/messages/TypingIndicator"
+    publish:
+      operationId: sendTypingIndicator
+      message:
+        $ref: "#/components/messages/TypingIndicator"
+  conversation/{conversation_id}/read_receipts:
+    parameters:
+      conversation_id:
+        description: Unique identifier for the conversation thread
+        schema:
+          type: string
+    subscribe:
+      operationId: receiveReadReceipts
+      message:
+        $ref: "#/components/messages/MessageReadReceipt"
+    publish:
+      operationId: sendReadReceipt
+      message:
+        $ref: "#/components/messages/MessageReadReceipt"
+  system/announcements:
+    subscribe:
+      operationId: receiveSystemAnnouncements
+      message:
+        $ref: "#/components/messages/SystemAnnouncement"
+  system/property_updates:
+    subscribe:
+      operationId: receiveGlobalPropertyUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/NewPropertyListed"
+          - $ref: "#/components/messages/PropertySoldRented"
+          - $ref: "#/components/messages/FeaturedPropertyUpdate"
+components:
+  messages:
+    NewMessageReceived:
+      payload:
+        $ref: "#/components/schemas/MessagePayload"
+    PropertyViewNotification:
+      payload:
+        $ref: "#/components/schemas/PropertyViewNotificationPayload"
+    InquiryReceivedNotification:
+      payload:
+        $ref: "#/components/schemas/InquiryNotificationPayload"
+    FavoriteAddedNotification:
+      payload:
+        $ref: "#/components/schemas/FavoriteNotificationPayload"
+    PropertyStatusUpdateNotification:
+      payload:
+        $ref: "#/components/schemas/PropertyStatusNotificationPayload"
+    PriceChangeNotification:
+      payload:
+        $ref: "#/components/schemas/PriceChangeNotificationPayload"
+    NewPropertyAlertNotification:
+      payload:
+        $ref: "#/components/schemas/NewPropertyAlertPayload"
+    ViewingRequestNotification:
+      payload:
+        $ref: "#/components/schemas/ViewingRequestNotificationPayload"
+    NewInquiryReceived:
+      payload:
+        $ref: "#/components/schemas/InquiryPayload"
+    FavoritePropertyAdded:
+      payload:
+        $ref: "#/components/schemas/FavoritePropertyPayload"
+    FavoritePropertyRemoved:
+      payload:
+        $ref: "#/components/schemas/FavoritePropertyPayload"
+    FavoriteListCreated:
+      payload:
+        $ref: "#/components/schemas/FavoriteListPayload"
+    FavoriteListUpdated:
+      payload:
+        $ref: "#/components/schemas/FavoriteListPayload"
+    SavedSearchAlert:
+      payload:
+        $ref: "#/components/schemas/SavedSearchAlertPayload"
+    UserPresenceUpdate:
+      payload:
+        $ref: "#/components/schemas/UserPresencePayload"
+    PropertyViewTracked:
+      payload:
+        $ref: "#/components/schemas/PropertyViewPayload"
+    PropertyDetailsUpdated:
+      payload:
+        $ref: "#/components/schemas/PropertyUpdatePayload"
+    PropertyMediaUpdated:
+      payload:
+        $ref: "#/components/schemas/PropertyMediaUpdatePayload"
+    PropertyStatusChanged:
+      payload:
+        $ref: "#/components/schemas/PropertyStatusChangePayload"
+    PropertyPriceChanged:
+      payload:
+        $ref: "#/components/schemas/PropertyPriceChangePayload"
+    ConversationMessageReceived:
+      payload:
+        $ref: "#/components/schemas/ConversationMessagePayload"
+    ConversationMessageSent:
+      payload:
+        $ref: "#/components/schemas/ConversationMessagePayload"
+    TypingIndicator:
+      payload:
+        $ref: "#/components/schemas/TypingIndicatorPayload"
+    MessageReadReceipt:
+      payload:
+        $ref: "#/components/schemas/ReadReceiptPayload"
+    SystemAnnouncement:
+      payload:
+        $ref: "#/components/schemas/SystemAnnouncementPayload"
+    NewPropertyListed:
+      payload:
+        $ref: "#/components/schemas/NewPropertyListedPayload"
+    PropertySoldRented:
+      payload:
+        $ref: "#/components/schemas/PropertySoldRentedPayload"
+    FeaturedPropertyUpdate:
+      payload:
+        $ref: "#/components/schemas/FeaturedPropertyPayload"
+  schemas:
+    MessagePayload:
+      type: object
+      properties:
+        message_id:
+          type: string
+        conversation_id:
+          type: string
+        sender_id:
+          type: string
+        recipient_id:
+          type: string
+        message_content:
+          type: string
+        message_type:
+          type: string
+          enum:
+            - text
+            - image
+            - file
+            - system
+        attachment_url:
+          type: string
+          nullable: true
+        property_id:
+          type: string
+          nullable: true
+        sender_info:
+          type: object
+          properties:
+            name:
+              type: string
+            profile_photo:
+              type: string
+              nullable: true
+            user_type:
+              type: string
+        timestamp:
+          type: string
+      required:
+        - message_id
+        - conversation_id
+        - sender_id
+        - recipient_id
+        - message_content
+        - message_type
+        - sender_info
+        - timestamp
+    PropertyViewNotificationPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        property_id:
+          type: string
+        property_title:
+          type: string
+        viewer_info:
+          type: object
+          properties:
+            name:
+              type: string
+            user_type:
+              type: string
+            contact_preference:
+              type: string
+        view_details:
+          type: object
+          properties:
+            view_duration_seconds:
+              type: number
+              nullable: true
+            device_type:
+              type: string
+              nullable: true
+            referrer_url:
+              type: string
+              nullable: true
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - property_id
+        - property_title
+        - viewer_info
+        - timestamp
+    InquiryNotificationPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        inquiry_id:
+          type: string
+        property_id:
+          type: string
+        property_title:
+          type: string
+        inquirer_info:
+          type: object
+          properties:
+            user_id:
+              type: string
+            name:
+              type: string
+            contact_preference:
+              type: string
+            phone_number:
+              type: string
+              nullable: true
+            email:
+              type: string
+              nullable: true
+        inquiry_details:
+          type: object
+          properties:
+            inquiry_type:
+              type: string
+              enum:
+                - viewing
+                - general
+                - price
+                - availability
+            message:
+              type: string
+            preferred_viewing_date:
+              type: string
+              nullable: true
+            preferred_viewing_time:
+              type: string
+              nullable: true
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - inquiry_id
+        - property_id
+        - property_title
+        - inquirer_info
+        - inquiry_details
+        - timestamp
+    FavoriteNotificationPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        property_id:
+          type: string
+        property_title:
+          type: string
+        user_info:
+          type: object
+          properties:
+            name:
+              type: string
+            user_type:
+              type: string
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - property_id
+        - property_title
+        - user_info
+        - timestamp
+    PropertyStatusNotificationPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        property_id:
+          type: string
+        property_title:
+          type: string
+        status_change:
+          type: object
+          properties:
+            old_status:
+              type: string
+            new_status:
+              type: string
+              enum:
+                - active
+                - inactive
+                - sold
+                - rented
+                - draft
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - property_id
+        - property_title
+        - status_change
+        - timestamp
+    PriceChangeNotificationPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        property_id:
+          type: string
+        property_title:
+          type: string
+        price_change:
+          type: object
+          properties:
+            old_price:
+              type: number
+            new_price:
+              type: number
+            currency:
+              type: string
+            change_percentage:
+              type: number
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - property_id
+        - property_title
+        - price_change
+        - timestamp
+    NewPropertyAlertPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        search_id:
+          type: string
+        search_name:
+          type: string
+        matching_properties:
+          type: array
+          items:
+            type: object
+            properties:
+              property_id:
+                type: string
+              title:
+                type: string
+              price:
+                type: number
+              currency:
+                type: string
+              location:
+                type: object
+                properties:
+                  governorate:
+                    type: string
+                  city:
+                    type: string
+                  neighborhood:
+                    type: string
+                    nullable: true
+              property_type:
+                type: string
+              transaction_type:
+                type: string
+              primary_image:
+                type: string
+                nullable: true
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - search_id
+        - search_name
+        - matching_properties
+        - timestamp
+    ViewingRequestNotificationPayload:
+      type: object
+      properties:
+        notification_id:
+          type: string
+        property_id:
+          type: string
+        property_title:
+          type: string
+        requester_info:
+          type: object
+          properties:
+            user_id:
+              type: string
+            name:
+              type: string
+            contact_preference:
+              type: string
+            phone_number:
+              type: string
+              nullable: true
+        viewing_details:
+          type: object
+          properties:
+            preferred_date:
+              type: string
+              nullable: true
+            preferred_time:
+              type: string
+              nullable: true
+            message:
+              type: string
+              nullable: true
+        timestamp:
+          type: string
+      required:
+        - notification_id
+        - property_id
+        - property_title
+        - requester_info
+        - viewing_details
+        - timestamp
+    InquiryPayload:
+      type: object
+      properties:
+        inquiry_id:
+          type: string
+        property_id:
+          type: string
+        user_id:
+          type: string
+        inquiry_type:
+          type: string
+          enum:
+            - viewing
+            - general
+            - price
+            - availability
+        message:
+          type: string
+        contact_preference:
+          type: string
+          enum:
+            - phone
+            - email
+            - whatsapp
+            - message
+        phone_number:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        preferred_viewing_date:
+          type: string
+          nullable: true
+        preferred_viewing_time:
+          type: string
+          nullable: true
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            price:
+              type: number
+            currency:
+              type: string
+            location:
+              type: string
+        user_info:
+          type: object
+          properties:
+            name:
+              type: string
+            profile_photo:
+              type: string
+              nullable: true
+            user_type:
+              type: string
+        timestamp:
+          type: string
+      required:
+        - inquiry_id
+        - property_id
+        - user_id
+        - inquiry_type
+        - message
+        - contact_preference
+        - property_info
+        - user_info
+        - timestamp
+    FavoritePropertyPayload:
+      type: object
+      properties:
+        favorite_id:
+          type: string
+        user_id:
+          type: string
+        property_id:
+          type: string
+        favorite_list_id:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            price:
+              type: number
+            currency:
+              type: string
+            location:
+              type: string
+            primary_image:
+              type: string
+              nullable: true
+        action:
+          type: string
+          enum:
+            - added
+            - removed
+            - updated
+        timestamp:
+          type: string
+      required:
+        - favorite_id
+        - user_id
+        - property_id
+        - property_info
+        - action
+        - timestamp
+    FavoriteListPayload:
+      type: object
+      properties:
+        list_id:
+          type: string
+        user_id:
+          type: string
+        list_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_public:
+          type: boolean
+        property_count:
+          type: number
+        action:
+          type: string
+          enum:
+            - created
+            - updated
+            - deleted
+        timestamp:
+          type: string
+      required:
+        - list_id
+        - user_id
+        - list_name
+        - is_public
+        - property_count
+        - action
+        - timestamp
+    SavedSearchAlertPayload:
+      type: object
+      properties:
+        alert_id:
+          type: string
+        search_id:
+          type: string
+        user_id:
+          type: string
+        search_name:
+          type: string
+        search_criteria:
+          type: object
+          properties:
+            location:
+              type: object
+              properties:
+                governorate:
+                  type: string
+                  nullable: true
+                city:
+                  type: string
+                  nullable: true
+                neighborhood:
+                  type: string
+                  nullable: true
+            property_type:
+              type: string
+              nullable: true
+            transaction_type:
+              type: string
+              nullable: true
+            price_range:
+              type: object
+              properties:
+                min:
+                  type: number
+                  nullable: true
+                max:
+                  type: number
+                  nullable: true
+        new_matches:
+          type: array
+          items:
+            type: object
+            properties:
+              property_id:
+                type: string
+              title:
+                type: string
+              price:
+                type: number
+              currency:
+                type: string
+              match_score:
+                type: number
+        alert_frequency:
+          type: string
+          enum:
+            - daily
+            - weekly
+            - monthly
+        timestamp:
+          type: string
+      required:
+        - alert_id
+        - search_id
+        - user_id
+        - search_name
+        - search_criteria
+        - new_matches
+        - alert_frequency
+        - timestamp
+    UserPresencePayload:
+      type: object
+      properties:
+        user_id:
+          type: string
+        presence_status:
+          type: string
+          enum:
+            - online
+            - offline
+            - away
+            - busy
+        last_seen:
+          type: string
+          nullable: true
+        device_info:
+          type: object
+          properties:
+            device_type:
+              type: string
+            browser:
+              type: string
+              nullable: true
+        timestamp:
+          type: string
+      required:
+        - user_id
+        - presence_status
+        - timestamp
+    PropertyViewPayload:
+      type: object
+      properties:
+        view_id:
+          type: string
+        property_id:
+          type: string
+        user_id:
+          type: string
+          nullable: true
+        session_id:
+          type: string
+          nullable: true
+        view_details:
+          type: object
+          properties:
+            view_duration_seconds:
+              type: number
+              nullable: true
+            device_type:
+              type: string
+              nullable: true
+            referrer_url:
+              type: string
+              nullable: true
+            ip_address:
+              type: string
+              nullable: true
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            price:
+              type: number
+            currency:
+              type: string
+            owner_id:
+              type: string
+        timestamp:
+          type: string
+      required:
+        - view_id
+        - property_id
+        - property_info
+        - timestamp
+    PropertyUpdatePayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        update_type:
+          type: string
+          enum:
+            - details
+            - media
+            - status
+            - price
+            - availability
+        updated_fields:
+          type: array
+          items:
+            type: string
+        previous_values:
+          type: object
+        new_values:
+          type: object
+        updated_by:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - update_type
+        - updated_fields
+        - new_values
+        - updated_by
+        - timestamp
+    PropertyMediaUpdatePayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        media_updates:
+          type: array
+          items:
+            type: object
+            properties:
+              media_id:
+                type: string
+              action:
+                type: string
+                enum:
+                  - added
+                  - removed
+                  - updated
+                  - reordered
+              media_type:
+                type: string
+                enum:
+                  - image
+                  - video
+                  - tour_360
+              media_url:
+                type: string
+              display_order:
+                type: number
+              is_primary:
+                type: boolean
+        updated_by:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - media_updates
+        - updated_by
+        - timestamp
+    PropertyStatusChangePayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        status_change:
+          type: object
+          properties:
+            from_status:
+              type: string
+            to_status:
+              type: string
+              enum:
+                - active
+                - inactive
+                - sold
+                - rented
+                - draft
+            reason:
+              type: string
+              nullable: true
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            price:
+              type: number
+            currency:
+              type: string
+        updated_by:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - status_change
+        - property_info
+        - updated_by
+        - timestamp
+    PropertyPriceChangePayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        price_change:
+          type: object
+          properties:
+            old_price:
+              type: number
+            new_price:
+              type: number
+            currency:
+              type: string
+            change_amount:
+              type: number
+            change_percentage:
+              type: number
+            price_negotiable:
+              type: boolean
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            location:
+              type: string
+        updated_by:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - price_change
+        - property_info
+        - updated_by
+        - timestamp
+    ConversationMessagePayload:
+      type: object
+      properties:
+        message_id:
+          type: string
+        conversation_id:
+          type: string
+        sender_id:
+          type: string
+        recipient_id:
+          type: string
+        message_content:
+          type: string
+        message_type:
+          type: string
+          enum:
+            - text
+            - image
+            - file
+            - system
+        attachment_url:
+          type: string
+          nullable: true
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          nullable: true
+        property_context:
+          type: object
+          properties:
+            property_id:
+              type: string
+            property_title:
+              type: string
+            property_price:
+              type: number
+            currency:
+              type: string
+        sender_info:
+          type: object
+          properties:
+            name:
+              type: string
+            profile_photo:
+              type: string
+              nullable: true
+            user_type:
+              type: string
+            verification_status:
+              type: object
+              properties:
+                email_verified:
+                  type: boolean
+                phone_verified:
+                  type: boolean
+        timestamp:
+          type: string
+      required:
+        - message_id
+        - conversation_id
+        - sender_id
+        - recipient_id
+        - message_content
+        - message_type
+        - is_read
+        - property_context
+        - sender_info
+        - timestamp
+    TypingIndicatorPayload:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        user_id:
+          type: string
+        is_typing:
+          type: boolean
+        user_info:
+          type: object
+          properties:
+            name:
+              type: string
+            profile_photo:
+              type: string
+              nullable: true
+        timestamp:
+          type: string
+      required:
+        - conversation_id
+        - user_id
+        - is_typing
+        - user_info
+        - timestamp
+    ReadReceiptPayload:
+      type: object
+      properties:
+        message_id:
+          type: string
+        conversation_id:
+          type: string
+        reader_id:
+          type: string
+        read_at:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - message_id
+        - conversation_id
+        - reader_id
+        - read_at
+        - timestamp
+    SystemAnnouncementPayload:
+      type: object
+      properties:
+        announcement_id:
+          type: string
+        type:
+          type: string
+          enum:
+            - maintenance
+            - feature_update
+            - policy_change
+            - general
+        title:
+          type: string
+        message:
+          type: string
+        priority:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+            - urgent
+        target_users:
+          type: array
+          items:
+            type: string
+          nullable: true
+        action_required:
+          type: boolean
+        expires_at:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+      required:
+        - announcement_id
+        - type
+        - title
+        - message
+        - priority
+        - action_required
+        - timestamp
+    NewPropertyListedPayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        property_details:
+          type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+              nullable: true
+            property_type:
+              type: string
+              enum:
+                - apartment
+                - villa
+                - house
+                - duplex
+                - commercial
+                - land
+            transaction_type:
+              type: string
+              enum:
+                - sale
+                - rent
+            price:
+              type: number
+            currency:
+              type: string
+            location:
+              type: object
+              properties:
+                governorate:
+                  type: string
+                city:
+                  type: string
+                neighborhood:
+                  type: string
+                  nullable: true
+            bedrooms:
+              type: number
+              nullable: true
+            bathrooms:
+              type: number
+              nullable: true
+            size:
+              type: number
+            size_unit:
+              type: string
+            primary_image:
+              type: string
+              nullable: true
+        owner_info:
+          type: object
+          properties:
+            user_id:
+              type: string
+            name:
+              type: string
+            user_type:
+              type: string
+            verification_status:
+              type: object
+              properties:
+                email_verified:
+                  type: boolean
+                phone_verified:
+                  type: boolean
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - property_details
+        - owner_info
+        - timestamp
+    PropertySoldRentedPayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        transaction_type:
+          type: string
+          enum:
+            - sold
+            - rented
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            final_price:
+              type: number
+            currency:
+              type: string
+            location:
+              type: string
+        transaction_details:
+          type: object
+          properties:
+            completion_date:
+              type: string
+            days_on_market:
+              type: number
+            final_price_vs_listing:
+              type: object
+              properties:
+                listing_price:
+                  type: number
+                final_price:
+                  type: number
+                difference_percentage:
+                  type: number
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - transaction_type
+        - property_info
+        - transaction_details
+        - timestamp
+    FeaturedPropertyPayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        featured_status:
+          type: boolean
+        feature_details:
+          type: object
+          properties:
+            featured_until:
+              type: string
+              nullable: true
+            boost_level:
+              type: string
+              enum:
+                - standard
+                - premium
+                - spotlight
+            promotion_type:
+              type: string
+              enum:
+                - homepage_carousel
+                - search_boost
+                - category_featured
+        property_info:
+          type: object
+          properties:
+            title:
+              type: string
+            price:
+              type: number
+            currency:
+              type: string
+            location:
+              type: string
+            primary_image:
+              type: string
+              nullable: true
+        timestamp:
+          type: string
+      required:
+        - property_id
+        - featured_status
+        - feature_details
+        - property_info
+        - timestamp
